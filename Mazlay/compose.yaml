@@ -1,0 +1,6 @@
+﻿services:
+  mazlaysupercar:
+    image: mazlaysupercar
+    build:
+      context: .
+      dockerfile: MazlaySuperCar/Dockerfile
