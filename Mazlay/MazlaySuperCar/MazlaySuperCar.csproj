@@ -15,14 +15,209 @@
 
     <ItemGroup>
       <Folder Include="Areas\AdminPanel\" />
+      <Folder Include="Views\403\" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.5" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.5">
+      <PackageReference Include="AutoMapper" Version="14.0.0" />
+      <PackageReference Include="FluentValidation" Version="12.0.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.6" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
+      <PackageReference Include="MongoDB.Driver" Version="3.4.0" />
+      <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="9.0.1-dev-02317" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
+      <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\assets\css\plugins.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\css\style.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfont3e6e.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfont3e6e.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfont3e6e.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfont3e6e.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfont3e6e.woff2" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\fontawesome-webfontd41d.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\ionicons28b5.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\ionicons28b5.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\ionicons28b5.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\ionicons28b5.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\Material-Design-Iconic-Fontd1f1.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\Material-Design-Iconic-Fontd1f1.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\Material-Design-Iconic-Fontd1f1.woff2" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\plaza-icon56cc.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\plaza-icon56cc.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\plaza-icon56cc.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\fonts\plaza-icon56cc.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about-us-policy-bg.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about-us-signature.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\about4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\About_icon1.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\About_icon2.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\About_icon3.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\quote-icon.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping1.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping10.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping2.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping3.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping4.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping5.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping6.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping7.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping8.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\shipping9.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\testimonial1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\testimonial2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\about\testimonial3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner10.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner11.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner12.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner13.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner14.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner15.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner16.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner17.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner18.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner19.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner20.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner21.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner22.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner23.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner8.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\banner9.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\bg\coming-soon.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog-big1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog-big2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog-big3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog-big4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog-big5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog8.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blog9.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blogpage1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blogpage2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blogpage3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blogpage4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\blogpage5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\comment2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\comment2.png.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\blog\comment3.png.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\brand\brand8.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\favicon.ico" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_grid.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_grid4.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_grid4_hover.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_grid_hover.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_list.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\bkg_list_hover.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon-app.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon-new.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon-phone.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon-phone2.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon-sale.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon1-app.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon1-new.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon1-sale.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon2-app.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\icon3-app.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\owl.video.play.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\papyel.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\icon\payment.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\logo\language.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\logo\logo.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\logo\logo2.png" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product10.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product11.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product12.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product13.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product8.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\product9.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\productbig1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\productbig2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\productbig3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\productbig4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\product\productbig5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\category7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\product.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\product2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\s-product\product3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider1.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider2.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider3.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider4.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider5.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider6.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider7.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\img\slider\slider8.jpg" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\js\main.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\assets\js\plugins.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\et-line.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\et-line.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\et-line.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\et-line.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\et-lined41d.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfont3e6e.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfont3e6e.svg" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfont3e6e.ttf" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfont3e6e.woff" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfont3e6e.woff2" />
+      <_ContentIncludedByDefault Remove="wwwroot\fonts\fontawesome-webfontd41d.eot" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\ajax-mail.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\bootstrap.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\main.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\plugins.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\popper.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\js\site.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\vendor\jquery-3.1.1.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\vendor\modernizr-2.8.3.min.js" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\Persistence\Persistence.csproj" />
     </ItemGroup>
 
 </Project>

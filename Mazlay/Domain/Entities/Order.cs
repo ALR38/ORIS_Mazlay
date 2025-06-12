@@ -1,16 +1,20 @@
-﻿namespace Domain.Entities;
+﻿using Domain.Common;
+using Domain.Enums;
 
-public class Order
+namespace Domain.Entities;
+
+public class Order : BaseEntity
 {
-    public int OrderId { get; set; }        // Идентификатор заказа
-    public int UserId { get; set; }         // Идентификатор пользователя
-    public DateTime OrderDate { get; set; } // Дата заказа
-    public decimal TotalPrice { get; set; } // Общая сумма заказа
-    public string ShippingAddress { get; set; }  // Адрес доставки
-    public string OrderStatus { get; set; }  // Статус заказа
-    public string PaymentStatus { get; set; } // Статус оплаты
+    public int ApplicationUserId { get; set; }
+    public ApplicationUser User  { get; set; } = null!;
 
-    // Навигационное свойство
-    public User User { get; set; }          // Связь с пользователем
-    public ICollection<OrderItem> OrderItems { get; set; }  // Связь с заказанными товарами
+    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
+    public decimal  TotalPrice { get; set; }
+
+    public string ShippingAddress { get; set; } = null!;
+
+    public OrderStatus   Status   { get; set; } = OrderStatus.Draft;
+    public PaymentStatus PayState { get; set; } = PaymentStatus.Pending;
+
+    public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
 }

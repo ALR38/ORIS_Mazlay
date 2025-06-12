@@ -1,14 +1,18 @@
-﻿namespace Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Domain.Common;
 
-public class OrderItem
+namespace Domain.Entities;
+
+public class OrderItem : BaseEntity
 {
-    public int OrderItemId { get; set; }    // Идентификатор элемента заказа
-    public int OrderId { get; set; }        // Идентификатор заказа
-    public int ProductId { get; set; }      // Идентификатор товара
-    public int Quantity { get; set; }       // Количество товара
-    public decimal Price { get; set; }      // Цена товара на момент покупки
+    public int OrderId   { get; set; }
+    public Order Order   { get; set; } = null!;
 
-    // Навигационные свойства
-    public Order Order { get; set; }        // Связь с заказом
-    public Product Product { get; set; }    // Связь с товаром
+    public int ProductId { get; set; }
+    public Product Product { get; set; } = null!;
+
+    public int Quantity  { get; set; }
+
+    [Column(TypeName = "decimal(18,2)")]
+    public decimal UnitPrice { get; set; }
 }

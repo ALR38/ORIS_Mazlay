@@ -1,18 +1,23 @@
-﻿namespace Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Domain.Common;
 
-public class Product
+namespace Domain.Entities;
+
+public class Product : BaseEntity
 {
-    public int ProductId { get; set; }      // Идентификатор товара
-    public string Name { get; set; }        // Название товара
-    public string Description { get; set; } // Описание товара
-    public decimal Price { get; set; }      // Цена товара
-    public int StockQuantity { get; set; }  // Количество на складе
-    public int CategoryId { get; set; }     // Идентификатор категории товара
+    [Required, MaxLength(150)]
+    public string Name { get; set; } = null!;
 
-    // Навигационное свойство
-    public Category Category { get; set; }  // Связь с категорией
+    public string? Description { get; set; }
 
-    public ICollection<OrderItem> OrderItems { get; set; }  // Заказы, в которые входит этот товар
-    public ICollection<ShoppingCartItem> ShoppingCartItems { get; set; }
-    public ICollection<WishlistItem> WishlistItems { get; set; }
+    [Range(0, 999999)]
+    public decimal Price { get; set; }
+
+    [Range(0, 100000)]
+    public int StockQuantity { get; set; }
+
+    public int CategoryId { get; set; }
+    public Category Category { get; set; } = null!;
+
+    public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
 }

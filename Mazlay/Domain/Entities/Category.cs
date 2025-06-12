@@ -1,11 +1,15 @@
-﻿namespace Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
+using Domain.Common;
 
-public class Category
+namespace Domain.Entities;
+
+public class Category : BaseEntity
 {
-    public int CategoryId { get; set; }    // Идентификатор категории
-    public string Name { get; set; }       // Название категории
-    public string Description { get; set; } // Описание категории
+    [Required, MaxLength(120)]
+    public string Name { get; set; } = null!;
 
-    // Навигационное свойство
-    public ICollection<Product> Products { get; set; }
+    [MaxLength(500)]
+    public string? Description { get; set; }
+
+    public ICollection<Product> Products { get; set; } = new List<Product>();
 }
