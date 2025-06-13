@@ -6,11 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
+/// <summary>EF Core DbContext c Identity на Guid.</summary>
 public class ApplicationDbContext
-    : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+       : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options) { }
+       public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+              : base(options) { }
 
     // DbSets
     public DbSet<Category> Categories => Set<Category>();

@@ -5,8 +5,8 @@ namespace Domain.Entities;
 
 public class Order : BaseEntity
 {
-    public int ApplicationUserId { get; set; }
-    public ApplicationUser User  { get; set; } = null!;
+    public Guid ApplicationUserId { get; set; }
+    public ApplicationUser User { get; set; }
 
     public DateTime OrderDate { get; set; } = DateTime.UtcNow;
     public decimal  TotalPrice { get; set; }

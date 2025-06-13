@@ -1,0 +1,4 @@
+﻿namespace Application.DTOs;
+
+/// <summary>Данные, приходящие с формы регистрации.</summary>
+public record RegisterDto(string Email, string Password);

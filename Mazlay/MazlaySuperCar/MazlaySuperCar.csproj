@@ -213,10 +213,13 @@
       <_ContentIncludedByDefault Remove="wwwroot\js\site.js" />
       <_ContentIncludedByDefault Remove="wwwroot\vendor\jquery-3.1.1.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\vendor\modernizr-2.8.3.min.js" />
+      <_ContentIncludedByDefault Remove="Views\Cooming-Soon\coming-soon.cshtml" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Application\Application.csproj" />
       <ProjectReference Include="..\Domain\Domain.csproj" />
+      <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
       <ProjectReference Include="..\Persistence\Persistence.csproj" />
     </ItemGroup>
 

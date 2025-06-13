@@ -1,37 +1,40 @@
-﻿using Application.Interfaces;
+﻿using Application.Common.Interfaces;
+using Application.Interfaces;
 using Application.Services;
-using Domain.Entities;
-using Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Infrastructure.Hubs;
+using Infrastructure.Mongo;
+using Infrastructure.Services;
+using Infrastructure.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using IAuthService = Application.Services.IAuthService;
 
 namespace Infrastructure;
 
+/// <summary>Регистрация всех инфраструктурных сервисов.</summary>
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection s, IConfiguration cfg)
+    public static IServiceCollection RegisterInfrastructure(
+        this IServiceCollection services, IConfiguration cfg)
     {
-        // SQL Server - строка "Default"
-        s.AddDbContext<ApplicationDbContext>(opt =>
-            opt.UseSqlServer(cfg.GetConnectionString("Default")));
+        // Mongo
+        services.AddSingleton<MongoDbContext>();
 
-        // Identity
-        s.AddIdentity<ApplicationUser, IdentityRole<int>>(opt =>
-            {
-                opt.Password.RequireDigit           = true;
-                opt.Password.RequiredLength         = 6;
-                opt.Password.RequireUppercase       = false;
-                opt.User.RequireUniqueEmail         = true;
-            })
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
+        // Доменные сервисы
+        services.AddScoped<IProductService , ProductService>();
+        services.AddScoped<ICartService    , CartService>();
+        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<IOrderService   , OrderService>();
+        services.AddScoped<IAuthService    , AuthService>();
 
-        // текущий пользователь
-        s.AddHttpContextAccessor();
-        s.AddScoped<ICurrentUser, CurrentUser>();
+        // Текущий пользователь
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-        return s;
+        // SignalR + сервис уведомлений
+        services.AddSignalR();
+        services.AddScoped<IOrderNotificationService, OrderNotificationService>();
+
+        return services;
     }
 }

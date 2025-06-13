@@ -1,22 +1,30 @@
-// Program.cs
-using Infrastructure.Data;
 using Domain.Entities;
+using Infrastructure;
+using Infrastructure.Hubs;             
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using System;
+using Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─────────────────────  SERVICES  ─────────────────────
+/*─────────────  LOGGING  (Serilog)  ─────────────*/
+builder.Host.UseSerilog((ctx, log) => log
+    .ReadFrom.Configuration(ctx.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day));
 
-// MVC + Razor
+/*─────────────  SERVICES  ─────────────*/
 builder.Services.AddControllersWithViews();
+builder.Services.AddSession();
 
-// EF Core  (SQL Server)
+/*  ─── DbContext + Identity с Guid ───  */
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
-// ASP.NET Identity (int ключи)
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(opt =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
         opt.Password.RequireNonAlphanumeric = false;
         opt.User.RequireUniqueEmail          = true;
@@ -24,41 +32,42 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<int>>(opt =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-// Настройка cookie-авторизации
+/*  Куки-авторизация  */
 builder.Services.ConfigureApplicationCookie(opt =>
 {
-    opt.LoginPath        = "/Account/Login";
+    opt.LoginPath        = "/Login/Login";
     opt.AccessDeniedPath = "/Account/Denied";
 });
 
-// -----------------------------------------------------------------------------
-var app = builder.Build();
+/*─────────────  DI-контейнер из слоя Infrastructure  ─────────────*/
+builder.Services.RegisterInfrastructure(builder.Configuration);
+/* ↑ внутри уже есть AddSignalR, IAuthService, Mongo-контекст и др. */
 
-// ─────────────────────  PIPELINE  ─────────────────────
+/*─────────────  PIPELINE  ─────────────*/
+var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    // своя страница 500
-    app.UseExceptionHandler("/Error/500");
+    app.UseExceptionHandler("/Error/404");
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
-// 1.  статика (wwwroot/…)
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// 2.  «красивые» страницы 404 / 403 / …
-app.UseStatusCodePagesWithReExecute("/{0}");   // вызовет /404, /403 …
+app.UseStatusCodePagesWithReExecute("/{0}");
 
-// 3.  основные маршруты
+/*  SignalR  */
+app.MapHub<NotificationHub>("/hubs/notifications");
+
+/*  MVC-маршрут  */
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    name:   "default",
+    pattern:"{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

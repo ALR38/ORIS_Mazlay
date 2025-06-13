@@ -39,10 +39,10 @@
                         </div>
                         <div class="header_top_links">
                             <ul>
-                                <li><a href="login.html">Register</a></li>
-                                <li><a href="login.html">login</a></li>
-                                <li><a href="cart.html">Shopping Cart</a></li>
-                                <li><a href="checkout.html">Checkout</a></li>
+                                <li><a asp-controller="Register" asp-action="Index">Register</a></li>
+                                <li><a asp-controller="Login" asp-action="Index">login</a></li>
+                                <li><a asp-controller="Cart" asp-action="Index">Shopping Cart</a></li>
+                                <li><a asp-controller="Checkout" asp-action="Index">Checkout</a></li>
                             </ul>
                         </div> 
                         <div class="search_container">
@@ -129,10 +129,10 @@
                         <div class="col-lg-8 col-md-7">
                             <div class="header_top_links text-right">
                                 <ul>
-                                    <li><a href="login.html">Register</a></li>
-                                    <li><a href="login.html">login</a></li>
-                                    <li><a href="cart.html">Shopping Cart</a></li>
-                                    <li><a href="checkout.html">Checkout</a></li>
+                                    <li><a asp-controller="Register" asp-action="Index">Register</a></li>
+                                    <li><a asp-controller="Login" asp-action="Index">login</a></li>
+                                    <li><a asp-controller="Cart" asp-action="Index">Shopping Cart</a></li>
+                                    <li><a asp-controller="Checkout" asp-action="Index">Checkout</a></li>
                                 </ul>
                             </div>   
                         </div>
@@ -147,7 +147,7 @@
                     <div class="row align-items-center">
                         <div class="col-lg-2 col-md-4 col-sm-4 col-4">
                             <div class="logo">
-                                <a href="index.html"><img src="~/img/logo/logo.png" alt=""></a>
+                                <a asp-controller="Home" asp-action="Index"><img src="~/img/logo/logo.png" alt=""></a>
                             </div>
                         </div>
                         <div class="col-lg-10 col-md-6 col-sm-6 col-6">
@@ -182,7 +182,7 @@
                                 </div>
                                 <div class="header_configure_area">
                                     <div class="header_wishlist">
-                                        <a href="wishlist.html"><i class="icon-heart"></i>
+                                        <a asp-controller="Wishlist" asp-action="Index"><i class="icon-heart"></i>
                                             <span class="wishlist_count">3</span>
                                         </a>
                                     </div>
@@ -241,10 +241,10 @@
                                             </div>
                                             <div class="mini_cart_footer">
                                                <div class="cart_button">
-                                                    <a href="cart.html">View cart</a>
+                                                    <a asp-controller="Cart" asp-action="Index">View cart</a>
                                                 </div>
                                                 <div class="cart_button">
-                                                    <a class="active" href="checkout.html">Checkout</a>
+                                                    <a class="active" asp-controller="Checkout" asp-action="Index">Checkout</a>
                                                 </div>
 
                                             </div>
@@ -391,10 +391,10 @@
                             <div class="main_menu menu_position text-left"> 
                                 <nav>  
                                     <ul>
-                                        <li><a class="active"  href="index.html">home</a>
+                                        <li><a class="active"  asp-controller="Home" asp-action="Index">home</a>
                                             
                                         </li>
-                                        <li class="mega_items"><a href="shop.html">shop</a> 
+                                        <li class="mega_items"><a asp-controller="Shop" asp-action="Index">shop</a> 
                                             <div class="mega_menu">
                                             </div>
                                         </li>
