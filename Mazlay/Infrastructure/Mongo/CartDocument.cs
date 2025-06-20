@@ -1,25 +1,28 @@
-﻿using MongoDB.Bson;
+﻿// Infrastructure/Mongo/CartDocument.cs
+
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
 
-namespace Infrastructure.Mongo;
-
-/// <summary>Документ корзины в MongoDB.</summary>
 public class CartDocument
 {
     [BsonId] public ObjectId Id { get; set; }
-
-    /// <summary>Guid пользователя (тот же, что в Identity).</summary>
     public Guid UserId { get; set; }
 
     public IList<CartLine> Lines { get; set; } = new List<CartLine>();
 
     public class CartLine
     {
-        public Guid    ProductId { get; set; }
+        public int     ProductId { get; set; }   // ← int!
         public string  Name      { get; set; } = string.Empty;
         public decimal Price     { get; set; }
         public int     Qty       { get; set; }
     }
+}
+
+// Infrastructure/Mongo/WishlistDocument.cs
+public class WishlistDocument
+{
+    [BsonId] public ObjectId Id { get; set; }
+    public Guid UserId { get; set; }
+    public IList<int> ProductIds { get; set; } = new List<int>();   // ← int!
 }

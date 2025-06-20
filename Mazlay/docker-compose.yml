@@ -1,0 +1,28 @@
+﻿version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: mazlay-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: MazlayDb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: YourPass123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  mongo:
+    image: mongo:7
+    container_name: mazlay-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  pg-data:
+  mongo-data:

@@ -39,11 +39,24 @@
                         </div>
                         <div class="header_top_links">
                             <ul>
+                                @if (!User.Identity!.IsAuthenticated)
+                                {
                                 <li><a asp-controller="Register" asp-action="Index">Register</a></li>
-                                <li><a asp-controller="Login" asp-action="Index">login</a></li>
-                                <li><a asp-controller="Cart" asp-action="Index">Shopping Cart</a></li>
+                                <li><a asp-controller="Login"    asp-action="Index">Login</a></li>
+                                }
+                                else
+                                {
+                                <li>
+                                    <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-link p-0">Logout</button>
+                                    </form>
+                                </li>
+                                }
+                                <li><a asp-controller="Cart"     asp-action="Index">Shopping Cart</a></li>
                                 <li><a asp-controller="Checkout" asp-action="Index">Checkout</a></li>
                             </ul>
+
                         </div> 
                         <div class="search_container">
                             <form action="#">
@@ -129,11 +142,24 @@
                         <div class="col-lg-8 col-md-7">
                             <div class="header_top_links text-right">
                                 <ul>
+                                    @if (!User.Identity!.IsAuthenticated)
+                                    {
                                     <li><a asp-controller="Register" asp-action="Index">Register</a></li>
-                                    <li><a asp-controller="Login" asp-action="Index">login</a></li>
-                                    <li><a asp-controller="Cart" asp-action="Index">Shopping Cart</a></li>
+                                    <li><a asp-controller="Login"    asp-action="Index">Login</a></li>
+                                    }
+                                    else
+                                    {
+                                    <li>
+                                        <form asp-controller="Login" asp-action="Logout" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn btn-link p-0">Logout</button>
+                                        </form>
+                                    </li>
+                                    }
+                                    <li><a asp-controller="Cart"     asp-action="Index">Shopping Cart</a></li>
                                     <li><a asp-controller="Checkout" asp-action="Index">Checkout</a></li>
                                 </ul>
+
                             </div>   
                         </div>
                     </div>

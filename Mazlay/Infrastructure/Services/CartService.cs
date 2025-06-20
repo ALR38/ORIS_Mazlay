@@ -1,86 +1,58 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Infrastructure.Data;
-using Infrastructure.Mongo;
-using MongoDB.Driver;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace Infrastructure.Services;
 
+/// <summary>Корзина, хранимая в Session (Mongo удалён).</summary>
 public sealed class CartService : ICartService
 {
-    private readonly IMongoCollection<CartDoc> _collection;
+    private readonly ISession _s;
     private readonly ApplicationDbContext _db;
+    private const string Key = "CartLines";
 
-    public CartService(MongoDbContext mongo, ApplicationDbContext db)
+    public CartService(IHttpContextAccessor ctx, ApplicationDbContext db)
     {
-        _collection = mongo.Db.GetCollection<CartDoc>("Cart");
+        _s  = ctx.HttpContext!.Session;
         _db = db;
     }
 
-    public async Task<IReadOnlyList<CartLineDto>> GetAsync(Guid userId)
+    /* вернуть строки */
+    public Task<IReadOnlyList<CartLineDto>> GetAsync(Guid _)
+        => Task.FromResult((IReadOnlyList<CartLineDto>)Read());
+
+    /* добавить / увеличить qty */
+    public async Task AddAsync(Guid _, int productId, int qty = 1)
     {
-        var doc = await _collection.Find(x => x.UserId == userId).FirstOrDefaultAsync();
-        return doc?.Lines.Select(ToDto).ToList() ?? new List<CartLineDto>();
-    }
+        var p = await _db.Products.FindAsync(productId);
+        if (p is null) return;
 
-    public async Task AddAsync(Guid userId, int productId, int qty = 1)
-    {
-        var prod = await _db.Products.FindAsync(productId);
-        if (prod is null) return;
+        var list = Read();
+        var idx  = list.FindIndex(l => l.ProductId == productId);
 
-        var doc = await _collection.Find(x => x.UserId == userId).FirstOrDefaultAsync()
-                  ?? new CartDoc { UserId = userId };
-
-        var line = doc.Lines.FirstOrDefault(l => l.ProductId == productId);
-        if (line is null)
-        {
-            doc.Lines.Add(new CartDoc.Line
-            {
-                ProductId = prod.Id,
-                Name = prod.Name,
-                Price = prod.Price,
-                Qty = qty
-            });
-        }
+        if (idx < 0)
+            list.Add(new CartLineDto(p.Id, p.Name, p.Price, qty));
         else
-        {
-            line.Qty += qty;
-        }
+            list[idx] = list[idx] with { Qty = list[idx].Qty + qty };
 
-        await _collection.ReplaceOneAsync(x => x.UserId == userId,
-            doc,
-            new ReplaceOptions { IsUpsert = true });
+        Write(list);
     }
 
-    public Task RemoveAsync(Guid userId, int productId) =>
-        _collection.UpdateOneAsync(
-            x => x.UserId == userId,
-            Builders<CartDoc>.Update.PullFilter(d => d.Lines,
-                l => l.ProductId == productId));
+    public Task RemoveAsync(Guid _, int productId)
+    {
+        var list = Read();
+        list.RemoveAll(l => l.ProductId == productId);
+        Write(list);
+        return Task.CompletedTask;
+    }
 
-    public Task ClearAsync(Guid userId) =>
-        _collection.DeleteOneAsync(x => x.UserId == userId);
+    public Task ClearAsync(Guid _) { _s.Remove(Key); return Task.CompletedTask; }
 
     /*──────── helpers ────────*/
-    private static CartLineDto ToDto(CartDoc.Line l)
-        => new(l.ProductId, l.Name, l.Price, l.Qty);
+    List<CartLineDto> Read() =>
+        JsonSerializer.Deserialize<List<CartLineDto>>(_s.GetString(Key) ?? "[]")!;
 
-    /* внутренний документ */
-    private sealed class CartDoc
-    {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public List<Line> Lines { get; set; } = new();
-
-        public sealed class Line
-        {
-            public int ProductId { get; set; }
-            public string Name { get; set; } = string.Empty;
-            public decimal Price { get; set; }
-            public int Qty { get; set; }
-        }
-    }
+    void Write(List<CartLineDto> data) =>
+        _s.SetString(Key, JsonSerializer.Serialize(data));
 }

@@ -1,4 +1,4 @@
-@model IReadOnlyList<Application.Interfaces.CartLineDto>
+﻿@model IReadOnlyList<Application.Interfaces.CartLineDto>
 @{
     ViewBag.Title = "Shopping Cart";
     Layout = "_Layout";
@@ -32,48 +32,53 @@
                                     <div class="cart_page">
                                         <table>
                                             <thead>
-                                                <tr>
-                                                    <th class="product_remove">Delete</th>
-                                                    <th class="product_thumb">Image</th>
-                                                    <th class="product_name">Product</th>
-                                                    <th class="product-price">Price</th>
-                                                    <th class="product_quantity">Quantity</th>
-                                                    <th class="product_total">Total</th>
-                                                </tr>
+                                            <tr>
+                                                <th class="product_remove">Delete</th>
+                                                <th class="product_thumb">Image</th>
+                                                <th class="product_name">Product</th>
+                                                <th class="product-price">Price</th>
+                                                <th class="product_quantity">Quantity</th>
+                                                <th class="product_total">Total</th>
+                                            </tr>
                                             </thead>
                                             <tbody>
-                                                <tr>
-                                                   <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                                    <td class="product_thumb"><a href="#"><img src="~/img/s-product/product.jpg" alt=""></a></td>
-                                                    <td class="product_name"><a href="#">Handbag fringilla</a></td>
-                                                    <td class="product-price">£65.00</td>
-                                                    <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                                    <td class="product_total">£130.00</td>
+                                            @foreach (var l in Model)
+                                            {
+                                            <tr>
+                                                <!-- DELETE -->
+                                                <td class="product_remove">
+                                                    <form asp-controller="Cart" asp-action="Remove" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="productId" value="@l.ProductId" />
+                                                        <button class="btn btn-link p-0"><i class="fa fa-trash-o"></i></button>
+                                                    </form>
+                                                </td>
 
+                                                <!-- IMAGE (можно плейсхолдер) -->
+                                                <td class="product_thumb">
+                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@l.ProductId">
+                                                        <img src="~/img/no-photo.jpg" alt="">
+                                                    </a>
+                                                </td>
 
-                                                </tr>
+                                                <!-- NAME / PRICE -->
+                                                <td class="product_name">@l.Name</td>
+                                                <td class="product-price">@l.Price:C</td>
 
-                                                <tr>
-                                                   <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                                    <td class="product_thumb"><a href="#"><img src="~/img/s-product/product2.jpg" alt=""></a></td>
-                                                    <td class="product_name"><a href="#">Handbags justo</a></td>
-                                                    <td class="product-price">£90.00</td>
-                                                    <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                                    <td class="product_total">£180.00</td>
+                                                <!-- QTY (обновляем qty) -->
+                                                <td class="product_quantity">
+                                                    <label>Quantity</label>
+                                                    <form asp-controller="Cart" asp-action="Update" method="post" class="d-inline">
+                                                        @Html.AntiForgeryToken()
+                                                        <input type="hidden" name="productId" value="@l.ProductId" />
+                                                        <input name="qty" min="1" max="100" value="@l.Qty" type="number">
+                                                    </form>
+                                                </td>
 
-
-                                                </tr>
-                                                <tr>
-                                                   <td class="product_remove"><a href="#"><i class="fa fa-trash-o"></i></a></td>
-                                                    <td class="product_thumb"><a href="#"><img src="~/img/s-product/product3.jpg" alt=""></a></td>
-                                                    <td class="product_name"><a href="#">Handbag elit</a></td>
-                                                    <td class="product-price">£80.00</td>
-                                                    <td class="product_quantity"><label>Quantity</label> <input min="1" max="100" value="1" type="number"></td>
-                                                    <td class="product_total">£160.00</td>
-
-
-                                                </tr>
-
+                                                <!-- SUBTOTAL -->
+                                                <td class="product_total">@l.Subtotal:C</td>
+                                            </tr>
+                                            }
                                             </tbody>
                                         </table>   
                                     </div>  
@@ -128,5 +133,3 @@
         </div>
     </div>
     <!--shopping cart area end -->
-    
-

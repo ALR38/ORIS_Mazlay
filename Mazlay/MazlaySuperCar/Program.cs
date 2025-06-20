@@ -1,3 +1,4 @@
+// Program.cs
 using Domain.Entities;
 using Infrastructure;
 using Infrastructure.Data;
@@ -8,22 +9,30 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*─────────────────  LOGGING (Serilog)  ─────────────────*/
+/*───────────────  LOGGING  ───────────────*/
 builder.Host.UseSerilog((ctx, log) => log
     .ReadFrom.Configuration(ctx.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day));
 
-/*─────────────────  SERVICES  ─────────────────*/
+/*───────────────  SERVICES  ───────────────*/
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession();
 
-/*──────  DbContext + Identity (Guid) — PostgreSQL  ─────*/
+/*  Session (нужна для Cart / Wishlist)  */
+builder.Services.AddDistributedMemoryCache();     
+builder.Services.AddSession(opt =>
+{
+    opt.Cookie.Name        = ".mazlay.session";
+    opt.Cookie.IsEssential = true;
+    opt.IdleTimeout        = TimeSpan.FromDays(7);
+});
+
+/* DbContext + Identity (PostgreSQL, Guid) */
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseNpgsql(                                      // ← было UseSqlServer
+    opt.UseNpgsql(
         builder.Configuration.GetConnectionString("Default"),
-        b => b.MigrationsAssembly("Persistence")));     // имя проекта с DbContext
+        b => b.MigrationsAssembly("Persistence")));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
@@ -33,17 +42,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-/*───  Куки-авторизация  ───*/
+/* Куки-авторизация */
 builder.Services.ConfigureApplicationCookie(opt =>
 {
     opt.LoginPath        = "/Login";
     opt.AccessDeniedPath = "/Account/Denied";
 });
 
-/*───  DI из Infrastructure (Mongo, SignalR и т.д.)  ───*/
 builder.Services.RegisterInfrastructure(builder.Configuration);
 
-/*─────────────────  PIPELINE  ─────────────────*/
+/*───────────────  PIPELINE  ───────────────*/
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -56,16 +64,16 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();
+app.UseSession();           
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStatusCodePagesWithReExecute("/{0}");
 
-/*───  SignalR  ───*/
+/* SignalR */
 app.MapHub<NotificationHub>("/hubs/notifications");
 
-/*───  MVC-маршрут  ───*/
+/* MVC-маршрут */
 app.MapControllerRoute(
     name:    "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

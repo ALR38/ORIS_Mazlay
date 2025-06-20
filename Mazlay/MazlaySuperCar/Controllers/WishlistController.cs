@@ -17,8 +17,8 @@ public class WishlistController : Controller
     [HttpGet("/Wishlist")]
     public async Task<IActionResult> Index()
     {
-        var ids = await _wish.GetAsync(GetUserId());
-        return View(ids);
+        var ids = await _wish.GetAsync(GetUserId());   
+        return View(ids);                              
     }
 
     [HttpPost("/Wishlist/Toggle")]

@@ -1,48 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Application.Interfaces;
-using Infrastructure.Mongo;
-using MongoDB.Driver;
+﻿using Application.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System.Text.Json;
 
 namespace Infrastructure.Services;
 
+/// <summary>Wish-list в Session (Mongo удалён).</summary>
 public sealed class WishlistService : IWishlistService
 {
-    private sealed class Doc
+    private readonly ISession _s;
+    private const string Key = "WishIds";
+
+    public WishlistService(IHttpContextAccessor ctx) =>
+        _s = ctx.HttpContext!.Session;
+
+    public Task<IList<int>> GetAsync(Guid _) =>
+        Task.FromResult<IList<int>>(Read());
+
+    public Task ToggleAsync(Guid _, int productId)
     {
-        public Guid       Id     { get; set; }
-        public Guid       UserId { get; set; }
-        public List<int>  Items  { get; set; } = new();
+        var list = Read();
+        if (!list.Remove(productId)) list.Add(productId);
+        Write(list);
+        return Task.CompletedTask;
     }
 
-    private readonly IMongoCollection<Doc> _collection;
-
-    public WishlistService(MongoDbContext mongo) =>
-        _collection = mongo.Db.GetCollection<Doc>("Wishlist");
-
-    public async Task<IList<int>> GetAsync(Guid userId) =>
-        (await _collection.Find(d => d.UserId == userId)
-            .FirstOrDefaultAsync())?.Items ?? new List<int>();
-
-    public async Task ToggleAsync(Guid userId, int productId)
-    {
-        var doc = await _collection.Find(d => d.UserId == userId)
-            .FirstOrDefaultAsync();
-
-        if (doc == null)
-        {
-            await _collection.InsertOneAsync(new Doc
-            {
-                UserId = userId,
-                Items  = new() { productId }
-            });
-            return;
-        }
-
-        if (doc.Items.Contains(productId)) doc.Items.Remove(productId);
-        else                                doc.Items.Add(productId);
-
-        await _collection.ReplaceOneAsync(d => d.Id == doc.Id, doc);
-    }
+    /*──────── helpers ────────*/
+    List<int> Read()  => JsonSerializer.Deserialize<List<int>>(_s.GetString(Key) ?? "[]")!;
+    void Write(List<int> d) => _s.SetString(Key, JsonSerializer.Serialize(d));
 }

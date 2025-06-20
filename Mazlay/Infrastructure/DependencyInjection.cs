@@ -17,21 +17,15 @@ public static class DependencyInjection
     public static IServiceCollection RegisterInfrastructure(
         this IServiceCollection services, IConfiguration cfg)
     {
-        // Mongo
-        services.AddSingleton<MongoDbContext>();
-
-        // Доменные сервисы
         services.AddScoped<IProductService , ProductService>();
-        services.AddScoped<ICartService    , CartService>();
-        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<ICartService    , CartService>();    
+        services.AddScoped<IWishlistService, WishlistService>();  
         services.AddScoped<IOrderService   , OrderService>();
         services.AddScoped<IAuthService    , AuthService>();
 
-        // Текущий пользователь
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
 
-        // SignalR + сервис уведомлений
         services.AddSignalR();
         services.AddScoped<IOrderNotificationService, OrderNotificationService>();
 
