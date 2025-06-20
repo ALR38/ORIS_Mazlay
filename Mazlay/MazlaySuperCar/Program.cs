@@ -1,49 +1,49 @@
 using Domain.Entities;
 using Infrastructure;
-using Infrastructure.Hubs;             
+using Infrastructure.Data;
+using Infrastructure.Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using System;
-using Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-/*─────────────  LOGGING  (Serilog)  ─────────────*/
+/*─────────────────  LOGGING (Serilog)  ─────────────────*/
 builder.Host.UseSerilog((ctx, log) => log
     .ReadFrom.Configuration(ctx.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.Console()
     .WriteTo.File("logs/app-.log", rollingInterval: RollingInterval.Day));
 
-/*─────────────  SERVICES  ─────────────*/
+/*─────────────────  SERVICES  ─────────────────*/
 builder.Services.AddControllersWithViews();
 builder.Services.AddSession();
 
-/*  ─── DbContext + Identity с Guid ───  */
+/*──────  DbContext + Identity (Guid) — PostgreSQL  ─────*/
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+    opt.UseNpgsql(                                      // ← было UseSqlServer
+        builder.Configuration.GetConnectionString("Default"),
+        b => b.MigrationsAssembly("Persistence")));     // имя проекта с DbContext
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
         opt.Password.RequireNonAlphanumeric = false;
-        opt.User.RequireUniqueEmail          = true;
+        opt.User.RequireUniqueEmail         = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-/*  Куки-авторизация  */
+/*───  Куки-авторизация  ───*/
 builder.Services.ConfigureApplicationCookie(opt =>
 {
-    opt.LoginPath        = "/Login/Login";
+    opt.LoginPath        = "/Login";
     opt.AccessDeniedPath = "/Account/Denied";
 });
 
-/*─────────────  DI-контейнер из слоя Infrastructure  ─────────────*/
+/*───  DI из Infrastructure (Mongo, SignalR и т.д.)  ───*/
 builder.Services.RegisterInfrastructure(builder.Configuration);
-/* ↑ внутри уже есть AddSignalR, IAuthService, Mongo-контекст и др. */
 
-/*─────────────  PIPELINE  ─────────────*/
+/*─────────────────  PIPELINE  ─────────────────*/
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -62,12 +62,12 @@ app.UseAuthorization();
 
 app.UseStatusCodePagesWithReExecute("/{0}");
 
-/*  SignalR  */
+/*───  SignalR  ───*/
 app.MapHub<NotificationHub>("/hubs/notifications");
 
-/*  MVC-маршрут  */
+/*───  MVC-маршрут  ───*/
 app.MapControllerRoute(
-    name:   "default",
-    pattern:"{controller=Home}/{action=Index}/{id?}");
+    name:    "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

@@ -1,17 +1,31 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Application.Interfaces;
 
-public record CartLineDto(int ProductId, string Name, decimal Price, int Qty)
-{
-    public decimal Subtotal => Price * Qty;
-}
-
+/// <summary>
+/// Работа с корзиной пользователя.
+/// </summary>
 public interface ICartService
 {
-    Task<IReadOnlyList<CartLineDto>> GetAsync(string userId);
-    Task AddAsync   (string userId, int productId, int qty = 1);
-    Task RemoveAsync(string userId, int productId);
-    Task ClearAsync (string userId);
+    /// <summary>Содержимое корзины.</summary>
+    Task<IReadOnlyList<CartLineDto>> GetAsync(Guid userId);
+
+    /// <summary>Добавить товар <paramref name="productId"/> в количестве <paramref name="qty"/>.</summary>
+    Task AddAsync   (Guid userId, int productId, int qty = 1);
+
+    Task RemoveAsync(Guid userId, int productId);
+
+    Task ClearAsync (Guid userId);
+}
+
+/// <summary>Строка корзины.</summary>
+public readonly record struct CartLineDto(
+    int    ProductId,
+    string Name,
+    decimal Price,
+    int    Qty)
+{
+    public decimal Subtotal => Price * Qty;
 }

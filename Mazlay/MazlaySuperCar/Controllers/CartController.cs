@@ -1,52 +1,56 @@
-﻿using Application.Interfaces;
-using Microsoft.AspNetCore.Mvc;
+﻿using System;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MazlaySuperCar.Controllers;
 
-public class CartController : Controller
+/// <summary>Корзина текущего пользователя.</summary>
+[Route("Cart")]
+public sealed class CartController : Controller
 {
-    private readonly ICartService    _cart;
-    private readonly IProductService _products;
+    private readonly ICartService _cart;
+    public CartController(ICartService cart) => _cart = cart;
 
-    public CartController(ICartService cart, IProductService products)
-        => (_cart, _products) = (cart, products);
-
-    // GET  /Cart
-    [HttpGet("/Cart")]
+    /* GET  /Cart */
+    [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var lines  = await _cart.GetAsync(userId);
-        return View(lines);                       // Views/Cart/Index.cshtml
+        var lines = await _cart.GetAsync(GetUserId());
+        return View(lines);                // Views/Cart/Index.cshtml
     }
 
-    // POST /Cart/Add   (AJAX или форма)
-    [HttpPost("/Cart/Add")]
+    /* POST /Cart/Add   (productId, qty) */
+    [HttpPost("Add")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Add(int productId, int qty = 1)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _cart.AddAsync(userId, productId, qty);
+        await _cart.AddAsync(GetUserId(), productId, qty);
         return Ok();
     }
 
-    // POST /Cart/Update
-    [HttpPost("/Cart/Update")]
+    /* POST /Cart/Update */
+    [HttpPost("Update")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Update(int productId, int qty)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        // простая логика: удалить старую строку и добавить новую qty
-        await _cart.RemoveAsync(userId, productId);
-        await _cart.AddAsync   (userId, productId, qty);
+        var uid = GetUserId();
+        await _cart.RemoveAsync(uid, productId);
+        await _cart.AddAsync   (uid, productId, qty);
         return Ok();
     }
 
-    // POST /Cart/Remove
-    [HttpPost("/Cart/Remove")]
+    /* POST /Cart/Remove */
+    [HttpPost("Remove")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Remove(int productId)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _cart.RemoveAsync(userId, productId);
+        await _cart.RemoveAsync(GetUserId(), productId);
         return Ok();
     }
+
+    /* helpers */
+    private Guid GetUserId() =>
+        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }

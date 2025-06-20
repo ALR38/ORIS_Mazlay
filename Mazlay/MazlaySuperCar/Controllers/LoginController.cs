@@ -1,7 +1,9 @@
-﻿using Application.Interfaces;
+﻿// Controllers/LoginController.cs
+using System.Threading.Tasks;
+using Application.Abstractions;
+using Application.Interfaces;
 using MazlaySuperCar.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace MazlaySuperCar.Controllers;
 
@@ -11,8 +13,8 @@ public class LoginController : Controller
     public LoginController(IAuthService auth) => _auth = auth;
 
     [HttpGet("/Login")]
-    public IActionResult Index(string? returnUrl = null)
-        => View(new LoginViewModel { ReturnUrl = returnUrl });
+    public IActionResult Index(string? returnUrl = null) =>
+        View(new LoginViewModel { ReturnUrl = returnUrl });
 
     [HttpPost("/Login")]
     [ValidateAntiForgeryToken]
@@ -21,8 +23,11 @@ public class LoginController : Controller
         if (!ModelState.IsValid) return View(vm);
 
         var ok = await _auth.LoginAsync(vm.Email, vm.Password, vm.Remember);
-        if (!ok) { ModelState.AddModelError("", "Неверные данные"); return View(vm); }
-
+        if (!ok)
+        {
+            ModelState.AddModelError("", "Неверные данные");
+            return View(vm);
+        }
         return LocalRedirect(vm.ReturnUrl ?? "/");
     }
 

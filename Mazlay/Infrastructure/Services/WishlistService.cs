@@ -1,34 +1,35 @@
-﻿using Application.Interfaces;
-using Infrastructure.Mongo;
-using MongoDB.Driver;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Application.Interfaces;
+using Infrastructure.Mongo;
+using MongoDB.Driver;
 
 namespace Infrastructure.Services;
 
-public class WishlistService : IWishlistService
+public sealed class WishlistService : IWishlistService
 {
-    private class Doc
+    private sealed class Doc
     {
         public Guid       Id     { get; set; }
-        public string     UserId { get; set; } = string.Empty;
+        public Guid       UserId { get; set; }
         public List<int>  Items  { get; set; } = new();
     }
 
     private readonly IMongoCollection<Doc> _collection;
 
-    public WishlistService(MongoDbContext mongo)
-        => _collection = mongo.Db.GetCollection<Doc>("Wishlist");
+    public WishlistService(MongoDbContext mongo) =>
+        _collection = mongo.Db.GetCollection<Doc>("Wishlist");
 
-    public async Task<IList<int>> GetAsync(string userId)
-        => (await _collection.Find(d => d.UserId == userId)
+    public async Task<IList<int>> GetAsync(Guid userId) =>
+        (await _collection.Find(d => d.UserId == userId)
             .FirstOrDefaultAsync())?.Items ?? new List<int>();
 
-    public async Task ToggleAsync(string userId, int productId)
+    public async Task ToggleAsync(Guid userId, int productId)
     {
         var doc = await _collection.Find(d => d.UserId == userId)
             .FirstOrDefaultAsync();
+
         if (doc == null)
         {
             await _collection.InsertOneAsync(new Doc

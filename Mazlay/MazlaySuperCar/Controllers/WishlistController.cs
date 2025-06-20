@@ -1,7 +1,9 @@
-﻿using Application.Interfaces;
+﻿using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace MazlaySuperCar.Controllers;
 
@@ -12,21 +14,20 @@ public class WishlistController : Controller
 
     public WishlistController(IWishlistService wish) => _wish = wish;
 
-    // GET /Wishlist
     [HttpGet("/Wishlist")]
     public async Task<IActionResult> Index()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        var ids    = await _wish.GetAsync(userId);
-        return View(ids);                          // пока отдаём ID-шники
+        var ids = await _wish.GetAsync(GetUserId());
+        return View(ids);
     }
 
-    // POST /Wishlist/Toggle
     [HttpPost("/Wishlist/Toggle")]
     public async Task<IActionResult> Toggle(int productId)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-        await _wish.ToggleAsync(userId, productId);
+        await _wish.ToggleAsync(GetUserId(), productId);
         return Ok();
     }
+
+    private Guid GetUserId() =>
+        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 }

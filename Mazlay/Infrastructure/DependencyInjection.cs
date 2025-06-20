@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Abstractions;
+using Application.Common.Interfaces;
 using Application.Interfaces;
 using Application.Services;
 using Infrastructure.Hubs;
@@ -7,7 +8,6 @@ using Infrastructure.Services;
 using Infrastructure.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using IAuthService = Application.Services.IAuthService;
 
 namespace Infrastructure;
 

@@ -1,7 +1,10 @@
-﻿using Application.Interfaces;
+﻿// Controllers/RegisterController.cs
+using System.Threading.Tasks;
+using Application.Abstractions;
+using Application.DTOs;
+using Application.Interfaces;
 using MazlaySuperCar.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace MazlaySuperCar.Controllers;
 
@@ -19,11 +22,13 @@ public class RegisterController : Controller
     {
         if (!ModelState.IsValid) return View(vm);
 
-        var ok = await _auth.RegisterAsync(
-            new RegisterDto(vm.Email, vm.Password));
-
-        if (!ok) { ModelState.AddModelError("", "Не получилось"); return View(vm); }
-
+        var result = await _auth.RegisterAsync(new RegisterDto(vm.Email, vm.Password));
+        if (!result.Succeeded)
+        {
+            foreach (var err in result.Errors)
+                ModelState.AddModelError(string.Empty, err);
+            return View(vm);
+        }
         return RedirectToAction("Index", "Home");
     }
 }

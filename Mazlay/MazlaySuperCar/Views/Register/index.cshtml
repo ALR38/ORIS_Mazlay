@@ -1,0 +1,70 @@
+@model MazlaySuperCar.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "_Layout";
+}
+
+<!--breadcrumbs area start-->
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="Index">home</a></li>
+                        <li>register</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--breadcrumbs area end-->
+
+<!-- customer register start -->
+<div class="login_page_bg">
+    <div class="container">
+        <div class="customer_login">
+            <div class="row justify-content-center">
+                <div class="col-lg-6 col-md-8">
+                    <div class="account_form register">
+                        <h2>Register</h2>
+
+                        <form asp-controller="Register"
+                              asp-action="Index"
+                              method="post">
+                            @Html.AntiForgeryToken()
+
+                            <p>
+                                <label asp-for="Email">Email address <span>*</span></label>
+                                <input asp-for="Email" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </p>
+
+                            <p>
+                                <label asp-for="Password">Password <span>*</span></label>
+                                <input asp-for="Password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </p>
+
+                            <p>
+                                <label asp-for="ConfirmPassword">Confirm password <span>*</span></label>
+                                <input asp-for="ConfirmPassword" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </p>
+
+                            <div class="login_submit">
+                                <button type="submit">Register</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- customer register end -->
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

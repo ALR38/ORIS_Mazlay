@@ -1,7 +1,8 @@
-﻿using Application.Interfaces;
+﻿// Controllers/ProductController.cs
+using System.Threading.Tasks;
+using Application.Interfaces;
 using MazlaySuperCar.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace MazlaySuperCar.Controllers;
 
@@ -23,7 +24,6 @@ public class ProductController : Controller
             PrevId  = await _products.GetPrevIdAsync(id),
             NextId  = await _products.GetNextIdAsync(id)
         };
-
-        return View(vm);                 // отдаём ViewModel!
+        return View(vm);
     }
 }

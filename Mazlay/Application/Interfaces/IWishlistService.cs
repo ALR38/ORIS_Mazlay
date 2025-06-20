@@ -1,10 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Application.Interfaces;
 
+/// <summary>
+/// «Избранное» пользователя.
+/// </summary>
 public interface IWishlistService
 {
-    Task<IList<int>> GetAsync(string userId);
-    Task ToggleAsync(string userId, int productId);
+    Task<IList<int>> GetAsync(Guid userId);
+
+    /// <summary>Добавить/удалить товар из wish‑листа.</summary>
+    Task ToggleAsync(Guid userId, int productId);
 }

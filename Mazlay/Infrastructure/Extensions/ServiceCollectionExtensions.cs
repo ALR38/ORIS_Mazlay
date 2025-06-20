@@ -13,19 +13,16 @@ public static class ServiceCollectionExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // 1) Entity-Framework Core (SQL Server)
         services.AddDbContext<ApplicationDbContext>(opt =>
             opt.UseSqlServer(configuration.GetConnectionString("Default")));
-
-        // 2) ASP.NET Identity  (int keys, ApplicationUser)
-        services.AddIdentity<ApplicationUser, IdentityRole<int>>(opt =>
+        
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;
-                opt.User.RequireUniqueEmail          = true;
+                opt.User.RequireUniqueEmail         = true;
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
-        
 
         return services;
     }
