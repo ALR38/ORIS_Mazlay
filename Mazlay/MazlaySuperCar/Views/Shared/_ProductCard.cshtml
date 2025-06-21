@@ -2,49 +2,42 @@
 
 <article class="single_product">
     <figure>
+        <!-- картинки -->
         <div class="product_thumb">
             <a class="primary_img"
-               asp-controller="Product"
-               asp-action="Details"
+               asp-controller="Product" asp-action="Details"
                asp-route-id="@Model.Id">
-                <img src="~/img/product/@Model.ImageMain" alt="@Model.Name" />
+                <img src="~/img/product/@Model.ImageMain" alt="@Model.Name"/>
             </a>
 
             <a class="secondary_img"
-               asp-controller="Product"
-               asp-action="Details"
+               asp-controller="Product" asp-action="Details"
                asp-route-id="@Model.Id">
-                <img src="~/img/product/@Model.ImageAlt" alt="@Model.Name" />
+                <img src="~/img/product/@Model.ImageAlt" alt="@Model.Name"/>
             </a>
 
-            <!-- пример метки -->
             <div class="label_product"><span class="label_new">new</span></div>
 
             <div class="quick_button">
-                <a href="#"
-                   data-bs-toggle="modal"
-                   data-bs-target="#modal_box"
+                <a href="#" data-bs-toggle="modal" data-bs-target="#modal_box"
                    title="quick view"><i class="icon-eye"></i></a>
             </div>
         </div>
 
+        <!-- текст -->
         <div class="product_content">
             <div class="product_content_inner">
                 <p class="manufacture_product"><a href="#">Parts</a></p>
 
                 <h4 class="product_name">
-                    <a asp-controller="Product"
-                       asp-action="Details"
+                    <a asp-controller="Product" asp-action="Details"
                        asp-route-id="@Model.Id">@Model.Name</a>
                 </h4>
 
-                <!-- статичный рейтинг -->
                 <div class="product_rating">
                     <ul>
                         @for (int i = 0; i < 5; i++)
-                        {
-                        <li><a href="#"><i class="ion-android-star-outline"></i></a></li>
-                        }
+                        { <li><i class="ion-android-star-outline"></i></li> }
                     </ul>
                 </div>
 
@@ -53,23 +46,19 @@
                 </div>
             </div>
 
-            <!-- фрагмент action_links -->
+            <!-- действия -->
             <div class="action_links">
                 <ul>
-                    <!-- ADD to cart (GET) -->
                     <li class="add_to_cart">
-                        <a asp-controller="Cart"
-                           asp-action="Add"
+                        <a asp-controller="Cart" asp-action="Add"
                            asp-route-id="@Model.Id"
                            asp-route-returnUrl="@Context.Request.Path">
                             Add to cart
                         </a>
                     </li>
 
-                    <!-- Wishlist toggle -->
                     <li class="wishlist">
-                        <a asp-controller="Wishlist"
-                           asp-action="Toggle"
+                        <a asp-controller="Wishlist" asp-action="Toggle"
                            asp-route-id="@Model.Id"
                            asp-route-returnUrl="@Context.Request.Path"
                            title="Add to Wishlist">
@@ -80,8 +69,6 @@
                     <li class="compare"><a href="#"><i class="icon-rotate-cw"></i></a></li>
                 </ul>
             </div>
-
-
         </div>
     </figure>
 </article>

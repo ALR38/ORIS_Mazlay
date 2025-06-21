@@ -1,5 +1,3 @@
-// Program.cs
-
 using System;
 using Application.Interfaces;
 using Domain.Entities;
@@ -22,6 +20,9 @@ builder.Host.UseSerilog((ctx, log) => log
 
 /* ────────────────── SERVICES ────────────────── */
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAntiforgery();
 
 /* базовая инфраструктура (AutoMapper, e‑mail и т.д.) */
 builder.Services.RegisterInfrastructure(builder.Configuration);
@@ -30,23 +31,19 @@ builder.Services.RegisterInfrastructure(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 
 /* session‑based Cart / Wishlist / Order */
-builder.Services.AddScoped<ICartService,     CartService>();
+builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IWishlistService, WishlistService>();
-builder.Services.AddScoped<IOrderService,    OrderService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
-/* Session (cookie“.mazlay.session”) */
+/* Session (cookie ".mazlay.session") */
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(opt =>
 {
-    opt.Cookie.Name        = ".mazlay.session";
+    opt.Cookie.Name = ".mazlay.session";
     opt.Cookie.IsEssential = true;
-
-    /* ← вставить прямо здесь */
     opt.Cookie.SecurePolicy = CookieSecurePolicy.None;
-
-    opt.IdleTimeout        = TimeSpan.FromDays(7);
+    opt.IdleTimeout = TimeSpan.FromDays(7);
 });
-
 
 /* PostgreSQL DbContext (миграции лежат в Persistence) */
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
@@ -58,14 +55,14 @@ builder.Services.AddDbContext<ApplicationDbContext>(opt =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(opt =>
     {
         opt.Password.RequireNonAlphanumeric = false;
-        opt.User.RequireUniqueEmail         = true;
+        opt.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.ConfigureApplicationCookie(opt =>
 {
-    opt.LoginPath        = "/Login";
+    opt.LoginPath = "/Login";
     opt.AccessDeniedPath = "/Account/Denied";
 });
 
@@ -83,7 +80,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseSession();        // ← Session ДО auth/authorization
+app.UseSession();
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -94,7 +91,38 @@ app.MapHub<NotificationHub>("/hubs/notifications");
 
 /* MVC */
 app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Users}/{action=Index}/{id?}");
+
+app.MapControllerRoute(
     name: "default",
-    pattern: "{controller}/{action}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+/* Создание роли админа и пользователя */
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    var roleName = "Admin";
+    var adminEmail = "admin@gmail.com";
+    var adminPass = "adminADMIN123!";
+
+    if (!await roleManager.RoleExistsAsync(roleName))
+        await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
+    {
+        var adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail
+        };
+
+        var result = await userManager.CreateAsync(adminUser, adminPass);
+        if (result.Succeeded)
+            await userManager.AddToRoleAsync(adminUser, roleName);
+    }
+}
 
 app.Run();

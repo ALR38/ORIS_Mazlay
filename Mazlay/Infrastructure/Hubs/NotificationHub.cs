@@ -1,22 +1,23 @@
-﻿using Infrastructure.Constants;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.SignalR;
 
-namespace Infrastructure.Hubs;
-
-/// <summary>Хаб уведомлений о заказах.</summary>
-[Authorize]
-public class NotificationHub : Hub
+namespace Infrastructure.Hubs
 {
-    public override async Task OnConnectedAsync()
+    public class NotificationHub : Hub
     {
-        if (Context.User!.IsInRole(AppRoles.Admin))
-            await Groups.AddToGroupAsync(Context.ConnectionId, HubGroups.Admins);
+        // Метод для отправки id заказа группе "Admins"
+        public async Task SendOrderNotification(int orderId)
+        {
+            await Clients.Group("Admins").SendAsync("ReceiveOrderNotification", orderId);
+        }
 
-        if (Context.User.IsInRole(AppRoles.Manager))
-            await Groups.AddToGroupAsync(Context.ConnectionId, HubGroups.Managers);
-
-        await base.OnConnectedAsync();
+        // При подключении добавляем только админов в группу "Admins"
+        public override async Task OnConnectedAsync()
+        {
+            if (Context.User.IsInRole("Admin"))
+            {
+                await Groups.AddToGroupAsync(Context.ConnectionId, "Admins");
+            }
+            await base.OnConnectedAsync();
+        }
     }
 }

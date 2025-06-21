@@ -58,4 +58,12 @@ public sealed class OrderService : IOrderService
             .ToListAsync();
         return list;
     }
+
+    public async Task<Order> GetOrderByIdAsync(int orderId)
+    {
+        return await _db.Orders
+            .Include(o => o.User)
+            .Include(o => o.Items).ThenInclude(i => i.Product)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+    }
 }
