@@ -8,7 +8,7 @@ namespace Domain.Entities
     {
         [BsonId] public ObjectId Id { get; set; }
 
-        /// <summary>Guid пользователя (тот же, что в Identity).</summary>
+        /// <summary>Guid пользователя (тот же, что в Data).</summary>
         public Guid UserId { get; set; }
 
         public List<CartItem> Items { get; set; } = new();

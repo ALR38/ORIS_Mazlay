@@ -17,10 +17,11 @@ public static class DependencyInjection
     public static IServiceCollection RegisterInfrastructure(
         this IServiceCollection services, IConfiguration cfg)
     {
-        services.AddScoped<IProductService , ProductService>();
-        services.AddScoped<ICartService    , CartService>();    
-        services.AddScoped<IWishlistService, WishlistService>();  
-        services.AddScoped<IOrderService   , OrderService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ICartService,     CartService>();
+        services.AddScoped<IWishlistService, WishlistService>();
+        services.AddScoped<IOrderService,    OrderService>();
+
         services.AddScoped<IAuthService    , AuthService>();
 
         services.AddHttpContextAccessor();

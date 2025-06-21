@@ -1,40 +1,54 @@
-﻿// Controllers/LoginController.cs
-using System.Threading.Tasks;
-using Application.Abstractions;
-using Application.Interfaces;
+﻿using Domain.Entities;
 using MazlaySuperCar.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace MazlaySuperCar.Controllers;
 
-public class LoginController : Controller
+[Route("Login")]
+[AllowAnonymous]                   // к контроллеру целиком
+public sealed class LoginController : Controller
 {
-    private readonly IAuthService _auth;
-    public LoginController(IAuthService auth) => _auth = auth;
+    private readonly SignInManager<ApplicationUser> _signInManager;
+    private readonly UserManager<ApplicationUser>   _userManager;
 
-    [HttpGet("/Login")]
-    public IActionResult Index(string? returnUrl = null) =>
+    public LoginController(
+        SignInManager<ApplicationUser> signInManager,
+        UserManager<ApplicationUser>   userManager) =>
+        (_signInManager, _userManager) = (signInManager, userManager);
+
+    /* ---------- GET  /Login ---------- */
+    [HttpGet("")]
+    public IActionResult Index(string returnUrl = "/") =>
         View(new LoginViewModel { ReturnUrl = returnUrl });
 
-    [HttpPost("/Login")]
+    /* ---------- POST /Login ---------- */
+    [HttpPost("")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Index(LoginViewModel vm)
+    public async Task<IActionResult> Index(LoginViewModel model)
     {
-        if (!ModelState.IsValid) return View(vm);
+        if (!ModelState.IsValid)
+            return View(model);
 
-        var ok = await _auth.LoginAsync(vm.Email, vm.Password, vm.Remember);
-        if (!ok)
+        var user = await _userManager.FindByEmailAsync(model.Email.Trim());
+        if (user is null || !await _userManager.CheckPasswordAsync(user, model.Password))
         {
-            ModelState.AddModelError("", "Неверные данные");
-            return View(vm);
+            ModelState.AddModelError(string.Empty, "Неверный e-mail или пароль");
+            return View(model);
         }
-        return LocalRedirect(vm.ReturnUrl ?? "/");
+
+        await _signInManager.SignInAsync(user, model.Remember);
+        return LocalRedirect(model.ReturnUrl ?? "/");
     }
 
-    [HttpPost("/Logout")]
+    /* ---------- POST /Login/Logout ---- */
+    [HttpPost("Logout")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
-        await _auth.LogoutAsync();
+        await _signInManager.SignOutAsync();
         return RedirectToAction("Index", "Home");
     }
 }

@@ -1,135 +1,178 @@
-﻿@model IReadOnlyList<Application.Interfaces.CartLineDto>
+﻿@using MazlaySuperCar.Models
+@model CartPageViewModel
+
 @{
-    ViewBag.Title = "Shopping Cart";
-    Layout = "_Layout";
+ViewBag.Title = "Shopping Cart";
+Layout        = "_Layout";
 }
 
-    <!--breadcrumbs area start-->
-    <div class="breadcrumbs_area">
-        <div class="container">   
-            <div class="row">
-                <div class="col-12">
-                    <div class="breadcrumb_content">
-                        <ul>
-                            <li><a asp-controller="Home" asp-action="Index">home</a></li>
-                            <li>Shopping Cart</li>
-                        </ul>
-                    </div>
+<!-- ====================================================== -->
+<!-- breadcrumbs -->
+<div class="breadcrumbs_area">
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="breadcrumb_content">
+                    <ul>
+                        <li><a asp-controller="Home" asp-action="Index">home</a></li>
+                        <li>Shopping Cart</li>
+                    </ul>
                 </div>
-            </div>
-        </div>         
-    </div>
-    <!--breadcrumbs area end-->
-    
-    <!--shopping cart area start -->
-    <div class="cart_page_bg">
-        <div class="container">
-            <div class="shopping_cart_area">
-                <form action="#"> 
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table_desc">
-                                    <div class="cart_page">
-                                        <table>
-                                            <thead>
-                                            <tr>
-                                                <th class="product_remove">Delete</th>
-                                                <th class="product_thumb">Image</th>
-                                                <th class="product_name">Product</th>
-                                                <th class="product-price">Price</th>
-                                                <th class="product_quantity">Quantity</th>
-                                                <th class="product_total">Total</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            @foreach (var l in Model)
-                                            {
-                                            <tr>
-                                                <!-- DELETE -->
-                                                <td class="product_remove">
-                                                    <form asp-controller="Cart" asp-action="Remove" method="post" class="d-inline">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="productId" value="@l.ProductId" />
-                                                        <button class="btn btn-link p-0"><i class="fa fa-trash-o"></i></button>
-                                                    </form>
-                                                </td>
-
-                                                <!-- IMAGE (можно плейсхолдер) -->
-                                                <td class="product_thumb">
-                                                    <a asp-controller="Product" asp-action="Details" asp-route-id="@l.ProductId">
-                                                        <img src="~/img/no-photo.jpg" alt="">
-                                                    </a>
-                                                </td>
-
-                                                <!-- NAME / PRICE -->
-                                                <td class="product_name">@l.Name</td>
-                                                <td class="product-price">@l.Price:C</td>
-
-                                                <!-- QTY (обновляем qty) -->
-                                                <td class="product_quantity">
-                                                    <label>Quantity</label>
-                                                    <form asp-controller="Cart" asp-action="Update" method="post" class="d-inline">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="productId" value="@l.ProductId" />
-                                                        <input name="qty" min="1" max="100" value="@l.Qty" type="number">
-                                                    </form>
-                                                </td>
-
-                                                <!-- SUBTOTAL -->
-                                                <td class="product_total">@l.Subtotal:C</td>
-                                            </tr>
-                                            }
-                                            </tbody>
-                                        </table>   
-                                    </div>  
-                                    <div class="cart_submit">
-                                        <button type="submit">update cart</button>
-                                    </div>      
-                                </div>
-                             </div>
-                         </div>
-                         <!--coupon code area start-->
-                        <div class="coupon_area">
-                            <div class="row">
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="coupon_code left">
-                                        <h3>Coupon</h3>
-                                        <div class="coupon_inner">   
-                                            <p>Enter your coupon code if you have one.</p>                                
-                                            <input placeholder="Coupon code" type="text">
-                                            <button type="submit">Apply coupon</button>
-                                        </div>    
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-md-6">
-                                    <div class="coupon_code right">
-                                        <h3>Cart Totals</h3>
-                                        <div class="coupon_inner">
-                                           <div class="cart_subtotal">
-                                               <p>Subtotal</p>
-                                               <p class="cart_amount">£215.00</p>
-                                           </div>
-                                           <div class="cart_subtotal ">
-                                               <p>Shipping</p>
-                                               <p class="cart_amount"><span>Flat Rate:</span> £255.00</p>
-                                           </div>
-                                           <a href="#">Calculate shipping</a>
-
-                                           <div class="cart_subtotal">
-                                               <p>Total</p>
-                                               <p class="cart_amount">£215.00</p>
-                                           </div>
-                                           <div class="checkout_btn">
-                                               <a href="#">Proceed to Checkout</a>
-                                           </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--coupon code area end-->
-                    </form>   
             </div>
         </div>
     </div>
-    <!--shopping cart area end -->
+</div>
+<!-- ====================================================== -->
+<!-- shopping‑cart -->
+<div class="cart_page_bg">
+    <div class="container">
+        <div class="shopping_cart_area">
+            <div class="row">
+                <div class="col-12">
+                    <div class="table_desc">
+
+                        <!-- cart table -->
+                        <div class="cart_page">
+                            <table>
+                                <thead>
+                                <tr>
+                                    <th class="product_remove">Delete</th>
+                                    <th class="product_thumb">Image</th>
+                                    <th class="product_name">Product</th>
+                                    <th class="product-price">Price</th>
+                                    <th class="product_quantity">Quantity</th>
+                                    <th class="product_total">Total</th>
+                                </tr>
+                                </thead>
+
+                                <tbody>
+                                @if (Model.Lines.Any())
+                                {
+                                foreach (var l in Model.Lines)
+                                {
+                                <tr>
+                                    <!-- remove -->
+                                    <td class="product_remove">
+                                        <form asp-controller="Cart"
+                                              asp-action="Remove"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@l.ProductId" />
+                                            <button class="btn btn-link p-0">
+                                                <i class="fa fa-trash-o"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+
+                                    <!-- image -->
+                                    <td class="product_thumb">
+                                        <a asp-controller="Product"
+                                           asp-action="Details"
+                                           asp-route-id="@l.ProductId">
+                                            <img src="~/img/product/@l.Image" alt="">
+                                        </a>
+                                    </td>
+
+                                    <!-- name & price -->
+                                    <td class="product_name">@l.Name</td>
+                                    <td class="product-price">@l.Price.ToString("C")</td>
+
+                                    <!-- qty (inline update) -->
+                                    <td class="product_quantity">
+                                        <form asp-controller="Cart"
+                                              asp-action="Update"
+                                              method="post"
+                                              class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="productId" value="@l.ProductId" />
+                                            <input  name="qty"
+                                                    min="1"
+                                                    max="100"
+                                                    value="@l.Quantity"
+                                                    type="number" />
+                                        </form>
+                                    </td>
+
+                                    <!-- line total -->
+                                    <td class="product_total">
+                                        @(l.Price * l.Quantity).ToString("C")
+                                    </td>
+                                </tr>
+                                }
+                                }
+                                else
+                                {
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        Cart is empty.
+                                    </td>
+                                </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- dummy “update cart” button (optional) -->
+                        <div class="cart_submit text-end">
+                            <a asp-controller="Cart"
+                               asp-action="Index"
+                               class="btn btn-sm btn-dark">
+                                Update cart
+                            </a>
+                        </div>
+
+                    </div> <!-- /.table_desc -->
+                </div>
+            </div>
+
+            <!-- coupon & totals -->
+            <div class="coupon_area mt-4">
+                <div class="row">
+                    <!-- coupon -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="coupon_code left">
+                            <h3>Coupon</h3>
+                            <div class="coupon_inner">
+                                <p>Enter your coupon code if you have one.</p>
+                                <input placeholder="Coupon code" type="text" />
+                                <button type="button">Apply coupon</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- totals -->
+                    <div class="col-lg-6 col-md-6">
+                        <div class="coupon_code right">
+                            <h3>Cart Totals</h3>
+                            <div class="coupon_inner">
+                                <div class="cart_subtotal">
+                                    <p>Subtotal</p>
+                                    <p class="cart_amount">@Model.Subtotal.ToString("C")</p>
+                                </div>
+
+                                <!-- shipping‑placeholder -->
+                                <div class="cart_subtotal">
+                                    <p>Shipping</p>
+                                    <p class="cart_amount"><span>Flat Rate:</span> –</p>
+                                </div>
+
+                                <div class="cart_subtotal">
+                                    <p>Total</p>
+                                    <p class="cart_amount">@Model.Subtotal.ToString("C")</p>
+                                </div>
+
+                                <div class="checkout_btn text-end">
+                                    <a asp-controller="Checkout" asp-action="Index">
+                                        Proceed to Checkout
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /row -->
+            </div><!-- /coupon_area -->
+        </div><!-- /shopping_cart_area -->
+    </div>
+</div>
+<!-- shopping‑cart end -->

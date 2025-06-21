@@ -1,7 +1,7 @@
 @model MazlaySuperCar.Models.LoginViewModel
 @{
-    ViewBag.Title = "Login";
-    Layout = "_Layout";
+ViewBag.Title = "Login";
+Layout       = "_Layout";
 }
 
 <!--breadcrumbs area start-->
@@ -31,10 +31,12 @@
                     <div class="account_form login">
                         <h2>login</h2>
 
-                        <form asp-controller="Login"
-                              asp-action="Index"
-                              method="post">
+                        <form asp-action="Index" method="post">
                             @Html.AntiForgeryToken()
+
+                            <!-- summary всех ошибок сервера -->
+                            <div asp-validation-summary="ModelOnly"
+                                 class="text-danger mb-2"></div>
 
                             <p>
                                 <label asp-for="Email">Username or email <span>*</span></label>
@@ -86,5 +88,5 @@
 <!-- customer login end -->
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<partial name="_ValidationScriptsPartial" />
 }

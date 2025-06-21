@@ -1,30 +1,52 @@
-﻿using Application.Interfaces;
+﻿// Infrastructure/Services/WishlistService.cs
+using Application.DTOs;
+using Application.Interfaces;
+using Infrastructure.Data;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-/// <summary>Wish-list в Session (Mongo удалён).</summary>
 public sealed class WishlistService : IWishlistService
 {
-    private readonly ISession _s;
-    private const string Key = "WishIds";
+    private const string KEY = "maz.wish";
+    private readonly IHttpContextAccessor _ctx;
+    private readonly ApplicationDbContext _db;
 
-    public WishlistService(IHttpContextAccessor ctx) =>
-        _s = ctx.HttpContext!.Session;
-
-    public Task<IList<int>> GetAsync(Guid _) =>
-        Task.FromResult<IList<int>>(Read());
-
-    public Task ToggleAsync(Guid _, int productId)
+    public WishlistService(IHttpContextAccessor ctx, ApplicationDbContext db)
     {
-        var list = Read();
-        if (!list.Remove(productId)) list.Add(productId);
-        Write(list);
+        _ctx = ctx;
+        _db  = db;
+    }
+
+    private ISession Ses => _ctx.HttpContext!.Session;
+
+    public async Task ToggleAsync(int productId)
+    {
+        var list = Ses.Get<List<WishlistItemDto>>(KEY) ?? [];
+
+        int idx = list.FindIndex(i => i.ProductId == productId);
+        if (idx >= 0)
+            list.RemoveAt(idx);
+        else
+        {
+            var p = await _db.Products
+                .AsNoTracking()
+                .SingleAsync(x => x.Id == productId);
+            list.Add(new(p.Id, p.Name, p.ImageMain, p.Price));
+        }
+
+        Ses.Set(KEY, list);
+    }
+
+    public Task ClearAsync()
+    {
+        Ses.Remove(KEY);
         return Task.CompletedTask;
     }
 
-    /*──────── helpers ────────*/
-    List<int> Read()  => JsonSerializer.Deserialize<List<int>>(_s.GetString(Key) ?? "[]")!;
-    void Write(List<int> d) => _s.SetString(Key, JsonSerializer.Serialize(d));
+    public Task<IReadOnlyList<WishlistItemDto>> GetItemsAsync() =>
+        Task.FromResult((IReadOnlyList<WishlistItemDto>)
+            (Ses.Get<List<WishlistItemDto>>(KEY) ?? []));
 }

@@ -1,54 +1,51 @@
-﻿using System;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Linq;                         // ← для Sum(...)
 using System.Threading.Tasks;
-using Application.Interfaces;
-using MazlaySuperCar.Models;
-using Microsoft.AspNetCore.Authorization;
+using Application.Interfaces;              // ICartService, IOrderService
+using Application.Common.Interfaces;       // ICurrentUserService
+using MazlaySuperCar.Models;               // CheckoutViewModel
 using Microsoft.AspNetCore.Mvc;
 
 namespace MazlaySuperCar.Controllers;
 
-/// <summary>Оформление заказа.</summary>
-[Authorize]
-[Route("Checkout")]
 public sealed class CheckoutController : Controller
 {
-    private readonly ICartService  _cart;
-    private readonly IOrderService _orders;
+    private readonly ICartService        _cart;
+    private readonly IOrderService       _orders;
+    private readonly ICurrentUserService _user;
 
-    public CheckoutController(ICartService cart, IOrderService orders) =>
-        (_cart, _orders) = (cart, orders);
+    public CheckoutController(
+        ICartService        cart,
+        IOrderService       orders,
+        ICurrentUserService user)
+    {
+        _cart   = cart;
+        _orders = orders;
+        _user   = user;
+    }
 
-    /* GET  /Checkout */
-    [HttpGet("")]
+    /* ----------- Корзина перед оформлением -------------------------- */
     public async Task<IActionResult> Index()
     {
-        var lines = await _cart.GetAsync(GetUserId());
-        return View(new CheckoutViewModel { Lines = lines });
+        var lines = await _cart.GetLinesAsync();
+
+        var vm = new CheckoutViewModel
+        {
+            Lines = lines,
+            Total = lines.Sum(l => l.Price * l.Quantity)
+        };
+
+        return View(vm);
     }
 
-    /* POST /Checkout/Pay */
-    [HttpPost("Pay")]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Pay()
+    /* ----------- Подтверждение заказа ------------------------------- */
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Place()
     {
-        var uid   = GetUserId();
-        var lines = await _cart.GetAsync(uid);
+        int orderId = await _orders.PlaceOrderAsync(_user.Id);
 
-        if (!lines.Any())
-            return RedirectToAction("Index", "Cart");
-
-        var orderId = await _orders.CreateAsync(uid, lines);
-        await _cart.ClearAsync(uid);
-
-        return RedirectToAction("Success", new { id = orderId });
+        TempData["orderId"] = orderId;        // для страницы «Спасибо»
+        return RedirectToAction(nameof(Success));
     }
 
-    /* GET /Checkout/Success/123 */
-    [HttpGet("Success/{id:int}")]
-    public IActionResult Success(int id) => View(model: id);
-
-    private Guid GetUserId() =>
-        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    public IActionResult Success() => View();
 }

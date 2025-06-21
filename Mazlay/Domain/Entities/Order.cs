@@ -1,20 +1,18 @@
-﻿using Domain.Common;
-using Domain.Enums;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Domain.Entities;
 
-public class Order : BaseEntity
+public sealed class Order
 {
-    public Guid ApplicationUserId { get; set; }
-    public ApplicationUser User { get; set; }
+    public int      Id          { get; set; }
+    public Guid     UserId      { get; set; }
+    public DateTime CreatedUtc  { get; set; }  
 
-    public DateTime OrderDate { get; set; } = DateTime.UtcNow;
-    public decimal  TotalPrice { get; set; }
-
-    public string ShippingAddress { get; set; } = null!;
-
-    public OrderStatus   Status   { get; set; } = OrderStatus.Draft;
-    public PaymentStatus PayState { get; set; } = PaymentStatus.Pending;
+    public decimal  Total       { get; set; }
 
     public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+
+    /* навигация */
+    public ApplicationUser User { get; set; } = null!;
 }

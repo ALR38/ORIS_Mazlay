@@ -1,9 +1,9 @@
-﻿using Application.Interfaces;
-using System.Collections.Generic;
+﻿using Application.DTOs; 
 
 namespace MazlaySuperCar.Models;
 
-public class CheckoutViewModel
+public sealed class CheckoutViewModel
 {
-    public IReadOnlyList<CartLineDto> Lines { get; set; } = new List<CartLineDto>();
+    public IReadOnlyList<CartLineDto> Lines { get; init; } = [];
+    public decimal                    Total { get; init; }
 }

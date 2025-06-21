@@ -1,4 +1,4 @@
-﻿// Infrastructure/Data/ApplicationDbContext.cs
+﻿using System;
 using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -6,57 +6,76 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-/// <summary>EF Core DbContext c Identity на Guid.</summary>
-public class ApplicationDbContext
-       : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+/// <summary>
+///  Db-контекст с Identity + бизнес-сущностями
+/// </summary>
+public sealed class ApplicationDbContext
+    : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
-       public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-              : base(options) { }
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options) { }
 
-    // DbSets
-    public DbSet<Category> Categories => Set<Category>();
-    public DbSet<Product>  Products   => Set<Product>();
-    public DbSet<Order>    Orders     => Set<Order>();
-    public DbSet<OrderItem> OrderItems => Set<OrderItem>();
+    public DbSet<Category>  Categories  => Set<Category>();
+    public DbSet<Product>   Products    => Set<Product>();
+    public DbSet<Order>     Orders      => Set<Order>();
+    public DbSet<OrderItem> OrderItems  => Set<OrderItem>();
 
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override void OnModelCreating(ModelBuilder b)
     {
-        base.OnModelCreating(builder);
+        base.OnModelCreating(b);
 
-        // таблицы — явные имена
-        builder.Entity<Category>().ToTable("Categories");
-        builder.Entity<Product>().ToTable("Products");
-        builder.Entity<Order>().ToTable("Orders");
-        builder.Entity<OrderItem>().ToTable("OrderItems");
+        /* ---------- Category ---------- */
+        b.Entity<Category>(e =>
+        {
+            e.Property(c => c.Name)
+             .IsRequired()
+             .HasMaxLength(128);
 
-        // decimal точность
-        builder.Entity<Product>()
-               .Property(p => p.Price)
-               .HasColumnType("decimal(18,2)");
+            // обратная связь:  Category.Products
+            e.HasMany(c => c.Products)
+             .WithOne(p => p.Category)
+             .HasForeignKey(p => p.CategoryId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
 
-        builder.Entity<OrderItem>()
-               .Property(p => p.UnitPrice)
-               .HasColumnType("decimal(18,2)");
+        /* ---------- Product ---------- */
+        b.Entity<Product>(e =>
+        {
+            e.Property(p => p.Name)
+             .IsRequired()
+             .HasMaxLength(256);
 
-        // связи "один-ко-многим"
-        builder.Entity<Product>()
-               .HasOne(p => p.Category)
-               .WithMany(c => c.Products)
-               .HasForeignKey(p => p.CategoryId);
+            e.Property(p => p.Price)
+             .HasColumnType("decimal(10,2)");
 
-        builder.Entity<Order>()
-               .HasOne(o => o.User)
-               .WithMany(u => u.Orders)
-               .HasForeignKey(o => o.ApplicationUserId);
+            // FK описан уже в Category section → ничего «CategoryId1» не появится
+        });
 
-        builder.Entity<OrderItem>()
-               .HasOne(i => i.Order)
-               .WithMany(o => o.Items)
-               .HasForeignKey(i => i.OrderId);
+        /* ---------- Order ---------- */
+        b.Entity<Order>(e =>
+        {
+            e.Property(o => o.CreatedUtc)
+             .HasColumnType("timestamp with time zone");
 
-        builder.Entity<OrderItem>()
-               .HasOne(i => i.Product)
-               .WithMany(p => p.OrderItems)
-               .HasForeignKey(i => i.ProductId);
+            e.Property(o => o.Total)
+             .HasColumnType("decimal(10,2)");
+
+            e.HasMany(o => o.Items)
+             .WithOne(i => i.Order)
+             .HasForeignKey(i => i.OrderId)
+             .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        /* ---------- OrderItem ---------- */
+        b.Entity<OrderItem>(e =>
+        {
+            e.Property(i => i.Price)
+             .HasColumnType("decimal(10,2)");
+
+            e.HasOne(i => i.Product)
+             .WithMany()                    // у Product нет коллекции OrderItems
+             .HasForeignKey(i => i.ProductId)
+             .OnDelete(DeleteBehavior.Restrict);
+        });
     }
 }

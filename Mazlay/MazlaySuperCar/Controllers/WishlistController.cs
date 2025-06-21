@@ -1,33 +1,28 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿// WishlistController.cs
+
 using Application.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MazlaySuperCar.Controllers;
-
-[Authorize]
-public class WishlistController : Controller
+public sealed class WishlistController : Controller
 {
     private readonly IWishlistService _wish;
-
     public WishlistController(IWishlistService wish) => _wish = wish;
 
-    [HttpGet("/Wishlist")]
-    public async Task<IActionResult> Index()
+    [HttpGet]                               // /Wishlist/Toggle/5
+    public async Task<IActionResult> Toggle(int id,
+        string? returnUrl = null)
     {
-        var ids = await _wish.GetAsync(GetUserId());   
-        return View(ids);                              
+        await _wish.ToggleAsync(id);
+        return LocalRedirect(returnUrl ?? Url.Action(nameof(Index))!);
     }
 
-    [HttpPost("/Wishlist/Toggle")]
-    public async Task<IActionResult> Toggle(int productId)
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> Clear()
     {
-        await _wish.ToggleAsync(GetUserId(), productId);
-        return Ok();
+        await _wish.ClearAsync();
+        return RedirectToAction(nameof(Index));
     }
 
-    private Guid GetUserId() =>
-        Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+    public async Task<IActionResult> Index() =>
+        View(await _wish.GetItemsAsync());
 }

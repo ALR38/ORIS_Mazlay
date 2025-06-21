@@ -2,14 +2,20 @@
 
 namespace MazlaySuperCar.Models;
 
+/// <summary>Поля формы регистрации + простая валидация.</summary>
 public class RegisterViewModel
 {
-    [Required, EmailAddress] public string Email    { get; set; } = string.Empty;
+    [Required(ErrorMessage = "E-mail обязателен")]
+    [EmailAddress(ErrorMessage = "Некорректный e-mail")]
+    public string Email { get; init; } = null!;
 
     [Required, DataType(DataType.Password)]
-    public string Password  { get; set; } = string.Empty;
+    [MinLength(8,  ErrorMessage = "Минимум 8 символов")]
+    [RegularExpression(@"^(?=.*\d)(?=.*[A-Za-z]).+$",
+        ErrorMessage = "Пароль должен содержать буквы и цифры")]
+    public string Password { get; init; } = null!;
 
-    [Required, DataType(DataType.Password),
-     Compare(nameof(Password))]
-    public string ConfirmPassword { get; set; } = string.Empty;
+    [Required, DataType(DataType.Password)]
+    [Compare(nameof(Password), ErrorMessage = "Пароли не совпадают")]
+    public string ConfirmPassword { get; init; } = null!;
 }

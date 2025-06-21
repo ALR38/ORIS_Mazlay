@@ -1,58 +1,73 @@
-﻿using Application.Interfaces;
+﻿// Infrastructure/Services/CartService.cs
+using Application.DTOs;
+using Application.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Extensions;
 using Microsoft.AspNetCore.Http;
-using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Services;
 
-/// <summary>Корзина, хранимая в Session (Mongo удалён).</summary>
 public sealed class CartService : ICartService
 {
-    private readonly ISession _s;
+    private const string KEY = "maz.cart";
+    private readonly IHttpContextAccessor _ctx;
     private readonly ApplicationDbContext _db;
-    private const string Key = "CartLines";
 
     public CartService(IHttpContextAccessor ctx, ApplicationDbContext db)
     {
-        _s  = ctx.HttpContext!.Session;
-        _db = db;
+        _ctx = ctx;
+        _db  = db;
     }
 
-    /* вернуть строки */
-    public Task<IReadOnlyList<CartLineDto>> GetAsync(Guid _)
-        => Task.FromResult((IReadOnlyList<CartLineDto>)Read());
+    private ISession Ses => _ctx.HttpContext!.Session;
 
-    /* добавить / увеличить qty */
-    public async Task AddAsync(Guid _, int productId, int qty = 1)
+    public async Task AddAsync(int productId, int qty = 1)
     {
-        var p = await _db.Products.FindAsync(productId);
-        if (p is null) return;
+        var list = Ses.Get<List<CartLineDto>>(KEY) ?? [];
 
-        var list = Read();
-        var idx  = list.FindIndex(l => l.ProductId == productId);
-
+        int idx = list.FindIndex(l => l.ProductId == productId);
         if (idx < 0)
-            list.Add(new CartLineDto(p.Id, p.Name, p.Price, qty));
-        else
-            list[idx] = list[idx] with { Qty = list[idx].Qty + qty };
+        {
+            var p = await _db.Products
+                             .AsNoTracking()
+                             .SingleAsync(x => x.Id == productId);
 
-        Write(list);
+            list.Add(new(p.Id, p.Name, p.ImageMain, p.Price, qty));
+        }
+        else
+        {
+            var l = list[idx];
+            list[idx] = l with { Quantity = l.Quantity + qty };
+        }
+
+        Ses.Set(KEY, list);
     }
 
-    public Task RemoveAsync(Guid _, int productId)
+    public Task RemoveAsync(int productId)
     {
-        var list = Read();
+        var list = Ses.Get<List<CartLineDto>>(KEY) ?? [];
         list.RemoveAll(l => l.ProductId == productId);
-        Write(list);
+        Ses.Set(KEY, list);
         return Task.CompletedTask;
     }
 
-    public Task ClearAsync(Guid _) { _s.Remove(Key); return Task.CompletedTask; }
+    public Task UpdateQtyAsync(int productId, int qty)
+    {
+        var list = Ses.Get<List<CartLineDto>>(KEY) ?? [];
+        int idx  = list.FindIndex(l => l.ProductId == productId);
+        if (idx >= 0) list[idx] = list[idx] with { Quantity = qty };
+        Ses.Set(KEY, list);
+        return Task.CompletedTask;
+    }
 
-    /*──────── helpers ────────*/
-    List<CartLineDto> Read() =>
-        JsonSerializer.Deserialize<List<CartLineDto>>(_s.GetString(Key) ?? "[]")!;
+    public Task ClearAsync()
+    {
+        Ses.Remove(KEY);
+        return Task.CompletedTask;
+    }
 
-    void Write(List<CartLineDto> data) =>
-        _s.SetString(Key, JsonSerializer.Serialize(data));
+    public Task<IReadOnlyList<CartLineDto>> GetLinesAsync() =>
+        Task.FromResult((IReadOnlyList<CartLineDto>)
+            (Ses.Get<List<CartLineDto>>(KEY) ?? []));
 }

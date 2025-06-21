@@ -3,7 +3,7 @@ using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
-using System.Linq;         
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Services;
@@ -15,10 +15,12 @@ public class ProductService : IProductService
     public ProductService(ApplicationDbContext db) => _db = db;
 
     /* 1. последние N товаров */
-    public async Task<IReadOnlyList<Product>> GetLatestAsync(int count = 8) =>
-        await _db.Products.OrderByDescending(p => p.Id)
-                          .Take(count)
-                          .ToListAsync();
+    public async Task<IReadOnlyList<Product>> GetLatestAsync(int count = 12) =>
+        await _db.Products
+                 .OrderByDescending(p => p.Id)          // «свежесть» по Id | CreatedAt – как удобнее
+                 .Take(count)
+                 .AsNoTracking()
+                 .ToListAsync();
 
     /* 2. конкретный товар  */
     public Task<Product?> GetByIdAsync(int id) =>
@@ -48,17 +50,15 @@ public class ProductService : IProductService
 
     /* 4. ← предыдущий товар */
     public async Task<int?> GetPrevIdAsync(int currentId) =>
-        await _db.Products
-                 .Where(p => p.Id < currentId)
-                 .OrderByDescending(p => p.Id)
-                 .Select(p => (int?)p.Id)
-                 .FirstOrDefaultAsync();
+        await _db.Products.Where(p => p.Id < currentId)
+                          .OrderByDescending(p => p.Id)
+                          .Select(p => (int?)p.Id)
+                          .FirstOrDefaultAsync();
 
     /* 5. → следующий товар */
     public async Task<int?> GetNextIdAsync(int currentId) =>
-        await _db.Products
-                 .Where(p => p.Id > currentId)
-                 .OrderBy(p => p.Id)
-                 .Select(p => (int?)p.Id)
-                 .FirstOrDefaultAsync();
+        await _db.Products.Where(p => p.Id > currentId)
+                          .OrderBy(p => p.Id)
+                          .Select(p => (int?)p.Id)
+                          .FirstOrDefaultAsync();
 }

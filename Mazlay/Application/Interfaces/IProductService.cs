@@ -9,7 +9,7 @@ namespace Application.Interfaces;
 /// </summary>
 public interface IProductService
 {
-    Task<IReadOnlyList<Product>> GetLatestAsync(int count = 8);
+    Task<IReadOnlyList<Product>> GetLatestAsync(int take = 12);
     Task<Product?>               GetByIdAsync(int id);
     Task<(IReadOnlyList<Product> Items, int Total)>
         SearchAsync(int page, int pageSize, int? categoryId, string? query);
@@ -19,4 +19,5 @@ public interface IProductService
 
     /// <summary>Id товара с большим Id (следующий) или null.</summary>
     Task<int?> GetNextIdAsync(int currentId);
+    
 }

@@ -1,7 +1,7 @@
 @model MazlaySuperCar.Models.RegisterViewModel
 @{
-    ViewBag.Title = "Register";
-    Layout = "_Layout";
+ViewBag.Title = "Register";
+Layout       = "_Layout";
 }
 
 <!--breadcrumbs area start-->
@@ -30,10 +30,11 @@
                     <div class="account_form register">
                         <h2>Register</h2>
 
-                        <form asp-controller="Register"
-                              asp-action="Index"
-                              method="post">
+                        <form asp-action="Index" method="post">
                             @Html.AntiForgeryToken()
+
+                            <!-- summary всех ошибок -->
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
 
                             <p>
                                 <label asp-for="Email">Email address <span>*</span></label>
@@ -66,5 +67,6 @@
 <!-- customer register end -->
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+<!-- jQuery Validate + unobtrusive (добавит инспекция Razor) -->
+<partial name="_ValidationScriptsPartial" />
 }

@@ -1,5 +1,4 @@
-﻿// Controllers/ProductController.cs
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Application.Interfaces;
 using MazlaySuperCar.Models;
 using Microsoft.AspNetCore.Mvc;
